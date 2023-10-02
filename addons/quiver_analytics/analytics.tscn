@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://cl357576hhwlm"]
+
+[ext_resource type="Script" path="res://addons/quiver_analytics/analytics.gd" id="1_fldbu"]
+
+[node name="Analytics" type="Node"]
+script = ExtResource("1_fldbu")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+use_threads = true
+timeout = 5.0
+
+[node name="RetryTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_http_request_request_completed"]
+[connection signal="timeout" from="RetryTimer" to="." method="_on_retry_timer_timeout"]
