@@ -3,20 +3,20 @@
 [Quiver Analytics](https://quiver.dev/analytics/) allows you to collect analytics for games made with the [Godot engine](https://godotengine.org) in a privacy-friendly way. In just a few minutes, you can integrate Analytics in your game through this open source plugin and gain valuable insight into how players are interacting with your game. You also have fine-grained control over how your players' privacy is handled.
 
 ## Guidelines
-Before you get started, note that Quiver Analytics is meant to be used to collect anonymous information about your players to understand how your game is played while respecting their privacy. Please do not track personal information like names, email addresses, physical addresses, phone numbers, IP addresses, or any other identifying information to Quiver Analytics. Doing so may cause your account to be restricted. If you have any questions, [give us a shout](https:/quiver.dev/contact/).
+Before you get started, note that Quiver Analytics is meant to be used to collect non-identifying information about your players to understand how your game is played while respecting their privacy. Please do not send personal information like names, email addresses, physical addresses, phone numbers, IP addresses, or any other identifying information to Quiver Analytics. Doing so may cause your account to be restricted. If you have any questions, [give us a shout](https:/quiver.dev/contact/).
 
 ## Prerequisites
-This plugin requires Godot 4.0 or later. It's also to be designed to work with GDScript. We'll add support for other languages in the future.
+This plugin requires Godot 4.0 or later. It's been designed to work with GDScript. We'll add support for other languages in the future.
 
 ## Installation
-* Register your account on [quiver.dev](https://quiver.dev)
-* Enable Analytics by going to to the [Quiver Analytics page](https://quiver.dev/analytics/) and creating an auth token
-* Grab this plugin from the Godot Asset Library (use the AssetLib view in the Godot editor) or copy the `quiver_analytics` directory in this repo to the `/addons/` directory in your project root
-* Go to your Project Settings -> Plugins and make sure Quiver Analytics is enabled
+* Register your account on [quiver.dev](https://quiver.dev).
+* Enable Analytics by going to to the [Quiver Analytics page](https://quiver.dev/analytics/) and creating an auth token.
+* Grab this plugin from the Godot Asset Library (use the AssetLib view in the Godot editor) or copy the `quiver_analytics` directory in this repo to the `/addons/` directory in your project root.
+* Go to your Project Settings -> Plugins and make sure Quiver Analytics is enabled.
 * Close Project Settings and reopen it again. Go to the General tab and you should see a new "Quiver" section at the bottom of the left window.
 * Go to Quiver -> Analytics in Project Settings and set your auth token to the token you created on the website.
-* Run your game (the default settings should post a "Game launched" event to your dashboard)
-* [View the dashboard](https://quiver.dev/analytics/) to see the new event
+* Run your game (the default settings should post a "Game launched" event to your dashboard).
+* [View the dashboard](https://quiver.dev/analytics/) to see the new event.
 
 ## Usage
 The `Analytics` autoload is added to your project automatically when you enable the plugin. 
@@ -47,7 +47,7 @@ The following is not required, but you do have additional functionality if you n
 
 ### Managing consent
 
-By default, the plugin won't ask for consent since no personally-identifying information is collected. However, you can enable opt-in data collection by going to Project Settings -> Quiver -> Analytics and set "Player Consent Required" to true. Now calls to `add_event()` will be ignored until you obtain consent. To manage consent, you can either use the built-in UI:
+By default, the plugin won't ask for consent since no personally identifying information is collected. However, you can enable opt-in data collection by going to Project Settings -> Quiver -> Analytics and set "Player Consent Required" to true. Now calls to `add_event()` will be ignored until you obtain consent. To manage consent, you can either use the built-in UI:
 
     if Analytics.should_show_consent_dialog():
       Analytics.show_consent_dialog(parent_node)
@@ -71,9 +71,9 @@ By default, the built-in consent UI will use whatever UI theme that has been set
 ### Advanced Properties
 If you turn on Advanced Settings for Project Settings -> Quiver -> Analytics, you'll find the following properties:
 
-Config File Path: where the config file is stored
-Auto Add Event on Launch: whether a "Launched game" event is sent automatically when the game starts
-Auto Add Event on Quit: whether a "Quit game" event is sent automatically after calling the `Analytics.handle_exit()` function.
+Config File Path: where the config file is stored, defaults to "user://analytics.cfg".
+Auto Add Event on Launch: whether a "Launched game" event is sent automatically when the game starts, defaults to true.
+Auto Add Event on Quit: whether a "Quit game" event is sent automatically after calling the `Analytics.handle_exit()` function, defaults to true.
 
 ### Notes and Limitations
 
