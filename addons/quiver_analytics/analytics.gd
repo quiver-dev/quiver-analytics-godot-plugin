@@ -15,19 +15,18 @@ extends Node
 ## Use this to pick a random player identifier
 const MAX_INT := 9223372036854775807
 
-## The maximum rate of requests we can send to the server per minute.
-## If this limit is exceeded, requests will be dropped
-const MAX_REQUEST_RATE_PER_MINUTE := 50
+## The maximum rate we can add events to the queue.
+## If this limit is exceeded, requests will be dropped.
+const MAX_ADD_TO_EVENT_QUEUE_RATE := 50
 
 ## This controls the maximum size of the request queue that is saved to disk
-## in the situation the events weren't able to 
-## In pathological cases, we may 
+## in the situation the events weren't able to be successfully sent
+## In pathological cases, we may drop events if the queue grows too long.
 const MAX_QUEUE_SIZE_TO_SAVE_TO_DISK := 200
 
 ## The file to store queue events that weren't able to be sent due to network or server issues
 const QUEUE_FILE_NAME := "user://analytics_queue"
 
-# XXX TODO CHANGEME
 ## The server host
 const SERVER_PATH := "https://quiver.dev"
 
@@ -36,6 +35,18 @@ const ADD_EVENT_PATH := "/analytics/events/add/"
 
 ## Event names can't exceed this length
 const MAX_EVENT_NAME_LENGTH := 50
+
+# The next two parameters guide how often we send artifical quit events.
+# We send these fake quit events because on certain platfomrms (mobile and web),
+# it can be hard to determine when a player ended the game (e.g. they background the app or close a tab).
+# So we just send periodic quit events with session IDs, which are reconciled by the server.
+
+# We send a quit event this many seconds after launching the game. 
+# We set this fairly low to handle immediate bounces from the game.
+const INITIAL_QUIT_EVENT_INTERVAL_SECONDS := 10
+
+# This is the max interval between sending quit events
+const MAX_QUIT_EVENT_INTERVAL_SECONDS := 60
 
 ## Emitted when the sending the final events have been completed
 signal exit_handled
@@ -61,10 +72,12 @@ var current_retry_time_seconds := min_retry_time_seconds
 var max_retry_time_seconds := 120.0
 var auto_add_event_on_launch := ProjectSettings.get_setting("quiver/analytics/auto_add_event_on_launch", true)
 var auto_add_event_on_quit := ProjectSettings.get_setting("quiver/analytics/auto_add_event_on_quit", true)
+var quit_event_interval_seconds := INITIAL_QUIT_EVENT_INTERVAL_SECONDS
+var session_id = abs(randi() << 32 | randi())
 
 @onready var http_request := $HTTPRequest
 @onready var retry_timer := $RetryTimer
-
+@onready var quit_event_timer := $QuitEventTimer
 
 func _ready() -> void:
 	# We attempt to load the saved configuration, if present
@@ -96,6 +109,8 @@ func _ready() -> void:
 	
 	if auto_add_event_on_launch:
 		add_event("Launched game")
+	if auto_add_event_on_quit:
+		quit_event_timer.start(quit_event_interval_seconds)
 
 #	if auto_add_event_on_quit:
 #		get_tree().set_auto_accept_quit(false)
@@ -156,12 +171,13 @@ func add_event(name: String, properties: Dictionary = {}) -> void:
 		requests_in_batch_count = 0
 	else:
 		requests_in_batch_count += 1
-	if requests_in_batch_count > MAX_REQUEST_RATE_PER_MINUTE:
+	if requests_in_batch_count > MAX_ADD_TO_EVENT_QUEUE_RATE:
 		printerr("[Quiver Analytics] Event tracking was disabled temporarily because max event rate was exceeded.")
 		return
 	
 	# Auto-add the platform
 	properties["$platform"] = OS.get_name()
+	properties["$session_id"] = session_id
 	
 	# Add the request to the queue and process the queue
 	var request := {
@@ -272,6 +288,11 @@ func _on_http_request_request_completed(result: int, response_code: int, headers
 func _on_retry_timer_timeout() -> void:
 	_process_requests()
 
+
+func _on_quit_event_timer_timeout() -> void:
+	add_event("Quit game")
+	quit_event_interval_seconds = min(quit_event_interval_seconds + 10, MAX_QUIT_EVENT_INTERVAL_SECONDS)
+	quit_event_timer.start(quit_event_interval_seconds)
 
 #func _notification(what):
 #	if what == NOTIFICATION_WM_CLOSE_REQUEST:

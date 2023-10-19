@@ -1,4 +1,5 @@
 
+
 # Quiver Analytics
 [Quiver Analytics](https://quiver.dev/analytics/) allows you to collect analytics for games made with the [Godot engine](https://godotengine.org) in a privacy-friendly way. In just a few minutes, you can integrate Analytics in your game through this open source plugin and gain valuable insight into how players are interacting with your game. You also have fine-grained control over how your players' privacy is handled.
 
@@ -36,11 +37,15 @@ By default, player consent isn't required for anonymous data collection, but if 
 
 ### Cleaning up before exiting the game
 
-Before you quit the game, you have to tell the plugin to send a configurable "Quit game event" and flush any outstanding events. To do that, write this code anywhere you are exiting the game:
+Before you quit the game, you can tell the plugin to send a configurable "Quit game" event and flush any outstanding events. To do that, write this code anywhere you are exiting the game:
 
 `await Analytics.handle_exit()`
 
 Note that SceneTree.quit() will immediately exit the game so you want to make sure you wait for the above call to finish before calling the quit() function.
+
+#### _Note for web and mobile games:_
+
+If you are developing a web or mobile game, it might be difficult to call `handle_exit()` since you don't always have the option to run operations when a player backgrounds the app or closes the tab. To work around this, we have added some special logic to automatically add 'Quit game' events. Note that the timing of this event is an estimate and might be up to a minute off the actual quit time. 
 
 ## Advanced Usage
 The following is not required, but you do have additional functionality if you need it.
@@ -49,21 +54,21 @@ The following is not required, but you do have additional functionality if you n
 
 By default, the plugin won't ask for consent since no personally-identifying information is collected. However, you can enable opt-in data collection by going to Project Settings -> Quiver -> Analytics and set "Player Consent Required" to true. Now calls to `add_event()` will be ignored until you obtain consent. To manage consent, you can either use the built-in UI:
 
-    if Analytics.should_show_consent_dialog():
-      Analytics.show_consent_dialog(parent_node)
+	if Analytics.should_show_consent_dialog():
+	  Analytics.show_consent_dialog(parent_node)
 
  This will decide whether consent has already been granted or denied and, if not, will spawn a consent dialog as a child of the parent_node.
 
 If you'd like to use your own UI and manually handle consent management, you can use the following functions:
 
-    # Variable storing whether consent has been requested
-    Analytics.consent_requested
-    # Variable storing consent status
-    Analytics.consent_granted
-    # Function to call if consent was granted
-    Analytics.approve_data_collection()
-    # Function to call if consent was denied
-    Analytics.deny_data_collection()
+	# Variable storing whether consent has been requested
+	Analytics.consent_requested
+	# Variable storing consent status
+	Analytics.consent_granted
+	# Function to call if consent was granted
+	Analytics.approve_data_collection()
+	# Function to call if consent was denied
+	Analytics.deny_data_collection()
 
 ### Customizing consent UI
 By default, the built-in consent UI will use whatever UI theme that has been set for your project. You can modify this by changing the properties of the ConsentDialog found in `/addons/quiver_analytics/consent_dialog.tscn`.
@@ -71,9 +76,9 @@ By default, the built-in consent UI will use whatever UI theme that has been set
 ### Advanced Properties
 If you turn on Advanced Settings for Project Settings -> Quiver -> Analytics, you'll find the following properties:
 
-Config File Path: where the config file is stored
-Auto Add Event on Launch: whether a "Launched game" event is sent automatically when the game starts
-Auto Add Event on Quit: whether a "Quit game" event is sent automatically after calling the `Analytics.handle_exit()` function.
+* "Config File Path": where the config file is stored
+* "Auto Add Event on Launch": whether a "Launched game" event is sent automatically when the game starts
+* "Auto Add Event on Quit": whether a "Quit game" event is sent automatically.
 
 ### Notes and Limitations
 

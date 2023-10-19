@@ -12,5 +12,8 @@ timeout = 5.0
 [node name="RetryTimer" type="Timer" parent="."]
 one_shot = true
 
+[node name="QuitEventTimer" type="Timer" parent="."]
+
 [connection signal="request_completed" from="HTTPRequest" to="." method="_on_http_request_request_completed"]
 [connection signal="timeout" from="RetryTimer" to="." method="_on_retry_timer_timeout"]
+[connection signal="timeout" from="QuitEventTimer" to="." method="_on_quit_event_timer_timeout"]
