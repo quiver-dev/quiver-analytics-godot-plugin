@@ -178,6 +178,8 @@ func add_event(name: String, properties: Dictionary = {}) -> void:
 	# Auto-add the platform
 	properties["$platform"] = OS.get_name()
 	properties["$session_id"] = session_id
+	properties["$debug"] = OS.is_debug_build()
+	properties["$export_template"] = OS.has_feature("template")
 	
 	# Add the request to the queue and process the queue
 	var request := {
