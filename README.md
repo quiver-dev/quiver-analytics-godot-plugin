@@ -8,9 +8,10 @@ Before you get started, note that Quiver Analytics is meant to be used to collec
 This plugin requires Godot 4.0 or later. It's been designed to work with GDScript. We'll add support for other languages in the future.
 
 ## Installation
-* Register your account on [quiver.dev](https://quiver.dev).
-* Enable Analytics by going to to the [Quiver Analytics page](https://quiver.dev/analytics/) and creating an auth token.
-* Grab this plugin from the Godot Asset Library (use the AssetLib view in the Godot editor) or copy the `quiver_analytics` directory in this repo to the `/addons/` directory in your project root.
+* Create an account on [quiver.dev](https://quiver.dev).
+* [Create a project](https://quiver.dev/projects/up/) on Quiver associated with your game.
+* Enable Analytics by going to to the [Quiver Analytics page](https://quiver.dev/analytics/), going to the Settings tab, and copying the authentication token from there.
+* Grab this plugin from the Godot Asset Library (use the AssetLib view in the Godot editor) or copy the `quiver_analytics` directory in the [Github repo](https://github.com/quiver-dev/quiver-analytics-godot-plugin) to the `/addons/` directory in your project root.
 * Go to your Project Settings -> Plugins and make sure Quiver Analytics is enabled.
 * Close Project Settings and reopen it again. Go to the General tab and you should see a new "Quiver" section at the bottom of the left window.
 * Go to Quiver -> Analytics in Project Settings and set your auth token to the token you created on the website.
