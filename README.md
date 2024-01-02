@@ -77,9 +77,8 @@ By default, the built-in consent UI will use whatever UI theme that has been set
 The plugin will automatically add the following default properties to all events:
 	
 * "$platform": The platform the game is running on. Can be either "Windows", "macOS", "Linux", "FreeBSD", "NetBSD", "OpenBSD", "BSD", "Android", "iOS", or "Web". Custom builds may yield other values.
-* "$session_id": The unique session identifier for this event. A session starts when the game launches and ends when the game is exited.
 * "$debug": Whether this event came from a debug build of the game. Both editor and debug versions of export templates will set debug to true. You can use this to filter out events created during development.
-* "$export_template": Whether this event came from a build using an export template, whether it is debug or release.
+* "$export_template": Whether this event came from a build using an export template, regardless if it is a debug or release build.
 
 All default property names start with a "$".
 
