@@ -1,14 +1,14 @@
 extends Node
-## This class handles sending events to Quiver Analytics.
+## Handles sending events to Quiver Analytics.
 ##
-## This class manages a request queue, that the plugin user can populate with events.
+## This class manages a request queue, which the plugin user can populate with events.
 ## Events are sent to the Quiver server one at a time.
 ## This class manages spacing out requests so as to not overload the server
 ## and to prevent performance issues in the game.
 ## If events are not able to be sent due to network connection issues,
 ## the events are saved to disk when the game exits.
 ##
-## This class prefers performance over accuracy, so events may be dropped if
+## This implementation favors performance over accuracy, so events may be dropped if
 ## they could lead to performance issues.
 
 
@@ -20,7 +20,7 @@ const MAX_INT := 9223372036854775807
 const MAX_ADD_TO_EVENT_QUEUE_RATE := 50
 
 ## This controls the maximum size of the request queue that is saved to disk
-## in the situation the events weren't able to be successfully sent
+## in the situation the events weren't able to be successfully sent.
 ## In pathological cases, we may drop events if the queue grows too long.
 const MAX_QUEUE_SIZE_TO_SAVE_TO_DISK := 200
 
@@ -175,7 +175,7 @@ func add_event(name: String, properties: Dictionary = {}) -> void:
 		printerr("[Quiver Analytics] Event tracking was disabled temporarily because max event rate was exceeded.")
 		return
 	
-	# Auto-add the platform
+	# Auto-add default properties
 	properties["$platform"] = OS.get_name()
 	properties["$session_id"] = session_id
 	properties["$debug"] = OS.is_debug_build()
@@ -191,7 +191,8 @@ func add_event(name: String, properties: Dictionary = {}) -> void:
 	_process_requests()
 
 
-## Must be called when a user exits the game.
+## Ideally, this should be called when a user exits the game, 
+## although it may be difficult on certain plaforms.
 ## This handles draining the request queue and saving the queue to disk, if necessary.
 func handle_exit():
 	should_drain_request_queue = true
@@ -221,9 +222,10 @@ func _load_queue_from_disk() -> void:
 
 func _handle_request_failure(response_code: int):
 	request_in_flight = false
-	# Drop invalid events
-	# 5xx and transient errors will be presumed to be fixed server-side
+	# Drop invalid 4xx events
+	# 5xx and transient errors will be presumed to be fixed server-side.
 	if response_code >= 400 and response_code <= 499:
+		request_queue.pop_front()
 		printerr("[Quiver Analytics] Event was dropped because it couldn't be processed by the server. Response code %d." % response_code)
 	# If we are not in draining mode, we retry with exponential backoff
 	if not should_drain_request_queue:
