@@ -72,6 +72,15 @@ If you'd like to use your own UI and manually handle consent management, you can
 ### Customizing consent UI
 By default, the built-in consent UI will use whatever UI theme that has been set for your project. You can modify this by changing the properties of the ConsentDialog found in `/addons/quiver_analytics/consent_dialog.tscn`.
 
+### Advanced Settings
+If you turn on Advanced Settings for Project Settings -> Quiver -> Analytics, you'll find the following properties:
+
+* "Config File Path": where the config file is stored, defaults to "user://analytics.cfg".
+* "Auto Add Event on Launch": whether a "Launched game" event is sent automatically when the game starts, defaults to true.
+* "Auto Add Event on Quit": whether a "Quit game" event is sent automatically, defaults to true.
+
+## More Information
+
 ### Default Properties
 
 The plugin will automatically add the following default properties to all events:
@@ -82,21 +91,19 @@ The plugin will automatically add the following default properties to all events
 
 All default property names start with a "$".
 
-### Advanced Settings
-If you turn on Advanced Settings for Project Settings -> Quiver -> Analytics, you'll find the following properties:
-
-* "Config File Path": where the config file is stored, defaults to "user://analytics.cfg".
-* "Auto Add Event on Launch": whether a "Launched game" event is sent automatically when the game starts, defaults to true.
-* "Auto Add Event on Quit": whether a "Quit game" event is sent automatically, defaults to true.
-
 ### Notes and Limitations
 
+* For games hosted on the web, analytics might not receive events if your players are using ad blockers.
 * Events are queued up and sent after some delay to prevent overloading the analytics server and negatively affecting game performance.
 * No more than 50 events can be sent in a minute to prevent the server from being overloaded from bursts of events.
 * Event names must be 50 characters or less.
 * If an event fails to send due to network or server issues, it will be retried with exponential backoff.
 * If `Analytics.handle_exit()` is called when the game is exited but any queued events fail to send, they'll be saved to disk and loaded the next time the game starts.
 * If the events saved to disk exceed more than 200 events, events will start to be dropped, starting with the oldest. This is to avoid performance issues with loading a large file of saved events.
+
+### Troubleshooting
+
+* If events are missing for your web-based game, it might be due to adblockers. You can disable your adblocker temporarily to allow analytics to work on your device.
 
 ### License
 
