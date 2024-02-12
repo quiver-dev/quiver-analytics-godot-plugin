@@ -1,5 +1,5 @@
 extends Node
-## Handles sending events to Quiver Analytics.
+## Handles sending events to Quiver Analytics (https://quiver.dev/analytics/).
 ##
 ## This class manages a request queue, which the plugin user can populate with events.
 ## Events are sent to the Quiver server one at a time.
@@ -41,7 +41,7 @@ const MAX_EVENT_NAME_LENGTH := 50
 # it can be hard to determine when a player ended the game (e.g. they background the app or close a tab).
 # So we just send periodic quit events with session IDs, which are reconciled by the server.
 
-# We send a quit event this many seconds after launching the game. 
+# We send a quit event this many seconds after launching the game.
 # We set this fairly low to handle immediate bounces from the game.
 const INITIAL_QUIT_EVENT_INTERVAL_SECONDS := 10
 
@@ -52,7 +52,7 @@ const MAX_QUIT_EVENT_INTERVAL_SECONDS := 60
 signal exit_handled
 
 
-var auth_token = ProjectSettings.get_setting("quiver/analytics/auth_token", "")
+var auth_token = ProjectSettings.get_setting("quiver/general/auth_token", "")
 var config_file_path := ProjectSettings.get_setting("quiver/analytics/config_file_path", "user://analytics.cfg")
 var consent_required = ProjectSettings.get_setting("quiver/analytics/player_consent_required", false)
 var consent_requested = false
@@ -95,18 +95,18 @@ func _ready() -> void:
 	else:
 		# If we don't have a config file, we create one now
 		_init_config()
-		
+
 	# Check to see if data collection is possible
 	if auth_token and (!consent_required or consent_granted):
 		data_collection_enabled = true
-		
+
 	# Let's load any saved events from previous sessions
 	# and start processing them, if available.
 	_load_queue_from_disk()
 	if not request_queue.is_empty():
 		DirAccess.remove_absolute(QUEUE_FILE_NAME)
 		_process_requests()
-	
+
 	if auto_add_event_on_launch:
 		add_event("Launched game")
 	if auto_add_event_on_quit:
@@ -153,16 +153,16 @@ func deny_data_collection() -> void:
 		config.save(config_file_path)
 
 
-## Use this track an event. The name must be 50 charactes or less.
+## Use this track an event. The name must be 50 characters or less.
 ## You can pass in an arbitrary dictionary of properties.
 func add_event(name: String, properties: Dictionary = {}) -> void:
 	if not data_collection_enabled:
 		return
-		
+
 	if name.length() > MAX_EVENT_NAME_LENGTH:
 		printerr("[Quiver Analytics] Event name '%s' is too long. Must be %d characters or less." % [name, MAX_EVENT_NAME_LENGTH])
 		return
-	
+
 	# We limit big bursts of event tracking to reduce overusage due to buggy code
 	# and to prevent overloading the server.
 	var current_time_msec = Time.get_ticks_msec()
@@ -174,13 +174,13 @@ func add_event(name: String, properties: Dictionary = {}) -> void:
 	if requests_in_batch_count > MAX_ADD_TO_EVENT_QUEUE_RATE:
 		printerr("[Quiver Analytics] Event tracking was disabled temporarily because max event rate was exceeded.")
 		return
-	
+
 	# Auto-add default properties
 	properties["$platform"] = OS.get_name()
 	properties["$session_id"] = session_id
 	properties["$debug"] = OS.is_debug_build()
 	properties["$export_template"] = OS.has_feature("template")
-	
+
 	# Add the request to the queue and process the queue
 	var request := {
 		"url": SERVER_PATH + ADD_EVENT_PATH,
@@ -191,7 +191,7 @@ func add_event(name: String, properties: Dictionary = {}) -> void:
 	_process_requests()
 
 
-## Ideally, this should be called when a user exits the game, 
+## Ideally, this should be called when a user exits the game,
 ## although it may be difficult on certain plaforms.
 ## This handles draining the request queue and saving the queue to disk, if necessary.
 func handle_exit():
@@ -206,7 +206,7 @@ func handle_exit():
 func _save_queue_to_disk() -> void:
 	var f = FileAccess.open(QUEUE_FILE_NAME, FileAccess.WRITE)
 	if f:
-		# If the queue is too big, we trim the queue, 
+		# If the queue is too big, we trim the queue,
 		# favoring more recent events (i.e. the back of the queue).
 		if request_queue.size() > MAX_QUEUE_SIZE_TO_SAVE_TO_DISK:
 			request_queue = request_queue.slice(request_queue.size() - MAX_QUEUE_SIZE_TO_SAVE_TO_DISK)
@@ -245,11 +245,11 @@ func _process_requests() -> void:
 		var request: Dictionary = request_queue.front()
 		request_in_flight = true
 		var error = http_request.request(
-			request["url"], 
-			request["headers"], 
-			HTTPClient.METHOD_POST, 
-			JSON.stringify(request["body"]
-		))
+			request["url"],
+			request["headers"],
+			HTTPClient.METHOD_POST,
+			JSON.stringify(request["body"])
+		)
 		if error != OK:
 			_handle_request_failure(error)
 	# If we have successfully drained the queue, emit the exit_handled signal

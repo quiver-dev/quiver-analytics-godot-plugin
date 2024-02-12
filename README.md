@@ -14,19 +14,19 @@ This plugin requires Godot 4.0 or later. It's been designed to work with GDScrip
 * Grab this plugin from the Godot Asset Library (use the AssetLib view in the Godot editor) or copy the `quiver_analytics` directory in the [Github repo](https://github.com/quiver-dev/quiver-analytics-godot-plugin) to the `/addons/` directory in your project root.
 * Go to your Project Settings -> Plugins and make sure Quiver Analytics is enabled.
 * Close Project Settings and reopen it again. Go to the General tab and you should see a new "Quiver" section at the bottom of the left window.
-* Go to Quiver -> Analytics in Project Settings and set your auth token to the token you created on the website.
+* Go to Quiver -> General in Project Settings and set your auth token to the token you created on the website.
 * Run your game (the default settings should post a "Game launched" event to your dashboard).
 * [View the dashboard](https://quiver.dev/analytics/) to see the new event.
 
 ## Usage
-The `Analytics` autoload is added to your project automatically when you enable the plugin. 
+The `Analytics` autoload is added to your project automatically when you enable the plugin.
 
 ### Adding an event
 To send an event, call:
 
 `Analytics.add_event(event_name, properties)`
 
-where `event_name` is the name of the event (should be 50 characters or less) and `properties` is an optional dictionary with key/values with additional properties that describe the event. 
+where `event_name` is the name of the event (should be 50 characters or less) and `properties` is an optional dictionary with key/values with additional properties that describe the event.
 
 Here's an example:
 
@@ -44,7 +44,7 @@ Note that SceneTree.quit() will immediately exit the game so you want to make su
 
 #### _Note for web and mobile games:_
 
-If you are developing a web or mobile game, it might be difficult to call `handle_exit()` since you don't always have the option to run operations when a player backgrounds the app or closes the tab. To work around this, we have added some special logic to automatically add 'Quit game' events. Note that the timing of this event is an estimate and might be up to a minute off the actual quit time. 
+If you are developing a web or mobile game, it might be difficult to call `handle_exit()` since you don't always have the option to run operations when a player backgrounds the app or closes the tab. To work around this, we have added some special logic to automatically add 'Quit game' events. Note that the timing of this event is an estimate and might be up to a minute off the actual quit time.
 
 ## Advanced Usage
 The following is not required, but you do have additional functionality if you need it.
@@ -84,7 +84,7 @@ If you turn on Advanced Settings for Project Settings -> Quiver -> Analytics, yo
 ### Default Properties
 
 The plugin will automatically add the following default properties to all events:
-	
+
 * "$platform": The platform the game is running on. Can be either "Windows", "macOS", "Linux", "FreeBSD", "NetBSD", "OpenBSD", "BSD", "Android", "iOS", or "Web". Custom builds may yield other values.
 * "$debug": Whether this event came from a debug build of the game. Both editor and debug versions of export templates will set debug to true. You can use this to filter out events created during development.
 * "$export_template": Whether this event came from a build using an export template, regardless if it is a debug or release build.
