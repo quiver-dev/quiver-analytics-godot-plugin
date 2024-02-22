@@ -157,10 +157,12 @@ func deny_data_collection() -> void:
 ## You can pass in an arbitrary dictionary of properties.
 func add_event(name: String, properties: Dictionary = {}) -> void:
 	if not data_collection_enabled:
+		_process_requests()
 		return
 
 	if name.length() > MAX_EVENT_NAME_LENGTH:
 		printerr("[Quiver Analytics] Event name '%s' is too long. Must be %d characters or less." % [name, MAX_EVENT_NAME_LENGTH])
+		_process_requests()
 		return
 
 	# We limit big bursts of event tracking to reduce overusage due to buggy code
@@ -195,6 +197,7 @@ func add_event(name: String, properties: Dictionary = {}) -> void:
 ## although it may be difficult on certain plaforms.
 ## This handles draining the request queue and saving the queue to disk, if necessary.
 func handle_exit():
+	quit_event_timer.stop()
 	should_drain_request_queue = true
 	if auto_add_event_on_quit:
 		add_event("Quit game")
@@ -254,6 +257,9 @@ func _process_requests() -> void:
 			_handle_request_failure(error)
 	# If we have successfully drained the queue, emit the exit_handled signal
 	if should_drain_request_queue and request_queue.is_empty():
+		# We only want to emit the exit_handled signal in the next frame,
+		# so that the caller has a chance to receive the signal.
+		await get_tree().process_frame
 		exit_handled.emit()
 
 
@@ -297,6 +303,7 @@ func _on_quit_event_timer_timeout() -> void:
 	add_event("Quit game")
 	quit_event_interval_seconds = min(quit_event_interval_seconds + 10, MAX_QUIT_EVENT_INTERVAL_SECONDS)
 	quit_event_timer.start(quit_event_interval_seconds)
+
 
 #func _notification(what):
 #	if what == NOTIFICATION_WM_CLOSE_REQUEST:
