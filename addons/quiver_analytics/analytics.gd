@@ -75,6 +75,9 @@ var auto_add_event_on_quit := ProjectSettings.get_setting("quiver/analytics/auto
 var quit_event_interval_seconds := INITIAL_QUIT_EVENT_INTERVAL_SECONDS
 var session_id = abs(randi() << 32 | randi())
 
+# Note that use_threads has to be turned off on this node because otherwise we get frame rate hitches
+# when the request is slow due to server issues.
+# Not sure why yet, but might be related to https://github.com/godotengine/godot/issues/33479.
 @onready var http_request := $HTTPRequest
 @onready var retry_timer := $RetryTimer
 @onready var quit_event_timer := $QuitEventTimer

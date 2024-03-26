@@ -6,7 +6,6 @@
 script = ExtResource("1_fldbu")
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
-use_threads = true
 timeout = 5.0
 
 [node name="RetryTimer" type="Timer" parent="."]
